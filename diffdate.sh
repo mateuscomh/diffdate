@@ -18,8 +18,8 @@ read -p "Insira uma data (AAAA-MM-DD) ou um número inteiro maior ou igual a 1: 
 if validate_user_input "$input"; then
   case "$choice" in
   D)
-    difference_in_days=$((($(date +%s) - $(date +%s --date "$input")) / (3600 * 24)))
-    echo "Diferença de dias entre a data atual e $input: $difference_in_days dias."
+    difference_in_days=$((($(date +%s) - $(date +%s --date "$input")) / (3600 * 24))) && 
+    echo "Diferença de dias entre hoje e $input é de: $difference_in_days dias."
     ;;
   N)
     echo "$input dias adiante será: $(date -d "+$input days")"
