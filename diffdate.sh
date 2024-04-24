@@ -20,8 +20,8 @@ echo "
   if validate_user_input "$input"; then
     case "$choice" in
     D)
-      difference_in_days=$((($(date +%s) - $(date +%s --date "$input")) / (3600 * 24))) &&
-        echo "Diferença de dias entre hoje e $input é de: $difference_in_days dias."
+      difference_in_days=$((($(date +%s --date "$input") - $(date +%s)) / (3600 * 24))) &&
+        echo "Diferença de dias entre hoje $(date +"%Y-%m-%d") e $input é de: $difference_in_days dias."
       ;;
     N)
       echo "$input dias adiante será: $(date -d "+$input days")"
