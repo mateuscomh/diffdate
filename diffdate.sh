@@ -1,5 +1,18 @@
 #!/bin/bash
+
+# ----------------------------------------------------------------------------
+# Script para calcular a data futura após adicionar um número específico de dias
+#
+# Descrição: Este script calcula a data que será após adicionar um número de dias
+# a partir de uma data inicial fornecida.
+#
+# Versão: 1.0
+# Data de criação: 11/03/2022
+# Autor: Matheus Martins - 3mhenrique@gmail.com
+# ----------------------------------------------------------------------------
+
 input="$1"
+today=$(date +"%Y-%m-%d")  
 validate_user_input() {
   if [ -z "$input" ]; then 
     echo -n "Insira uma data no formato (AAAA-MM-DD) ou um valor maior que 1 para calcular diferença de dias: "
@@ -20,12 +33,12 @@ echo "
   if validate_user_input "$input"; then
     case "$choice" in
     D)
-      difference_in_days=$((($(date +%s --date "$input") - $(date +%s)) / (3600 * 24))) &&
-        echo "Diferença de dias entre hoje $(date +"%Y-%m-%d") e $input é de: $difference_in_days dias."
+      diff_dias=$((($(date +%s --date "$input") - $(date +%s)) / (86400))) &&
+        echo "Diferença de dias entre hoje $today e $input é de: $diff_dias dias."
       ;;
     N)
-      echo "$input dias adiante será: $(date -d "+$input days")"
-      echo "$input dias atrás foi: $(date -d "-$input days")"
+      echo "$input dias adiante será: $(date -d "$today + $input days")"
+      echo "$input dias atrás foi: $(date -d "$today - $input days")"
       ;;
     esac
   else
