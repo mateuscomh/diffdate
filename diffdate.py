@@ -5,19 +5,23 @@
 # Descrição: Este programa calcula a data que será após adicionar um número de dias
 # a partir de uma data inicial fornecida.
 #
-# Versão: 1.1.0
+# Versão: 1.1.1
 # Data de criação: 11/03/2022
 # Autor: Matheus Martins - 3mhenrique@gmail.com
 # ----------------------------------------------------------------------------
 from datetime import datetime, timedelta
+import sys
 
 def validate_user_input(user_input):
     """
     Valida a entrada do usuário.
     Retorna uma tupla (tipo, valor) onde:
-    - tipo: "data" se for uma data no formato AAAA-MM-DD, "dias" se for um número inteiro, ou None se inválido.
-    - valor: a data ou o número de dias.
+    - tipo: "data" se for uma data no formato AAAA-MM-DD, "dias" se for um número inteiro, "sair" se for 'q' ou 'Q', ou None se inválido.
+    - valor: a data, o número de dias, ou None.
     """
+    if user_input.lower() in ('q', 'Q'):
+        return "sair", None
+
     try:
         # Verifica se é uma data no formato AAAA-MM-DD
         datetime.strptime(user_input, "%Y-%m-%d")
@@ -48,11 +52,8 @@ def calculate_date_diff(start_date, end_date):
 
     # Obtém a diferença exata de anos, meses e dias
     year_diff = end_date.year - start_date.year
-    year_diff = abs(year_diff)
     month_diff = end_date.month - start_date.month
-    month_diff = abs(month_diff)
     day_diff = end_date.day - start_date.day
-    day_diff = abs(day_diff)
 
     # Ajusta valores negativos corretamente
     if day_diff < 0:
@@ -65,15 +66,21 @@ def calculate_date_diff(start_date, end_date):
         year_diff -= 1
         month_diff += 12
 
+    # Usa abs() para garantir que os valores sejam positivos
+    year_diff = abs(year_diff)
+    month_diff = abs(month_diff)
+    day_diff = abs(day_diff)
+
     # Monta a diferença formatada, ignorando valores zero
     result = []
     if year_diff != 0:
-        result.append(f"{abs(year_diff)} ano(s)")
+        result.append(f"{year_diff} ano(s)")
     if month_diff != 0:
-        result.append(f"{abs(month_diff)} mês(es)")
+        result.append(f"{month_diff} mês(es)")
     if day_diff != 0:
-        result.append(f"{abs(day_diff)} dia(s)")
+        result.append(f"{day_diff} dia(s)")
 
+    result.append(f"\nTotal de {abs(diff_days)} dia(s)")
     # Retorna a diferença formatada
     return ", ".join(result)
 
@@ -103,7 +110,11 @@ def main():
         """
     )
 
-    user_input = input("Insira uma data no formato (AAAA-MM-DD) ou um valor maior que 1 para calcular diferença de dias: ")
+    # Verifica se o input foi passado como argumento
+    if len(sys.argv) > 1:
+        user_input = sys.argv[1]
+    else:
+        user_input = input("Insira uma data no formato (AAAA-MM-DD) ou um valor maior que 1 para calcular diferença de dias (ou 'q' para sair): ")
 
     tipo, valor = validate_user_input(user_input)
 
@@ -116,8 +127,11 @@ def main():
         )
     elif tipo == "dias":
         print(calculate_future_past_dates(valor))
+    elif tipo == "sair":
+        print("Saindo...")
+        sys.exit(0)
     else:
-        print("Entrada inválida. Insira uma data no formato AAAA-MM-DD ou um número inteiro maior ou igual a 1.")
+        print("Entrada inválida. Insira uma data no formato AAAA-MM-DD ou um número inteiro maior ou igual a 1 (ou 'q' para sair).")
 
 if __name__ == "__main__":
     main()
