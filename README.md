@@ -1,6 +1,6 @@
-# DiffDate - Calculadora de Diferença de Datas em Shell
+# DiffDate - Calculadora de Diferença de Datas
 
-**DiffDate** é um script em Shell que calcula a diferença entre duas datas, exibindo o resultado em anos, meses e dias. Além disso, ele também pode calcular datas futuras ou passadas com base em um número de dias fornecido.
+**DiffDate** é um script que calcula a diferença entre duas datas, exibindo o resultado em anos, meses e dias. Além disso, ele também pode calcular datas futuras ou passadas com base em um número de dias fornecido.
 
 ## Funcionalidades
 
