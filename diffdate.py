@@ -4,29 +4,34 @@
 # Descrição: Este programa calcula a data que será após adicionar um número de dias
 # a partir de uma data inicial fornecida. 
 #
-# Versão: 1.1.2
+# Versão: 1.2.2
 # Data de criação: 11/03/2022
 # Autor: Matheus Martins - 3mhenrique@gmail.com
 # ----------------------------------------------------------------------------
 from datetime import datetime, timedelta
 import sys
 
+from datetime import datetime
+
 def validate_user_input(user_input):
     """
     Valida a entrada do usuário.
     Retorna uma tupla (tipo, valor) onde:
-    - tipo: "data" se for uma data no formato DD-MM-AAAA 
+    - tipo: "data" se for uma data no formato DD-MM-AAAA (também aceita DD/MM/AAAA)
         "dias" se for um número inteiro 
         "sair" se for 'q' ou 'Q', ou None se inválido.
-    - valor: a data, o número de dias, ou None.
+    - valor: a data (como string no formato padronizado), o número de dias, ou None.
     """
-    if user_input.lower() in ('q', 'Q'):
+    if user_input.lower() == 'q':
         return "sair", None
+
+    # Normaliza separador de datas
+    normalized = user_input.replace("/", "-")
 
     try:
         # Verifica se é uma data no formato DD-MM-AAAA
-        datetime.strptime(user_input, "%d-%m-%Y")
-        return "data", user_input
+        date_obj = datetime.strptime(normalized, "%d-%m-%Y")
+        return "data", date_obj.strftime("%d-%m-%Y")
     except ValueError:
         try:
             # Verifica se é um número inteiro
@@ -36,6 +41,7 @@ def validate_user_input(user_input):
         except ValueError:
             pass
     return None, None
+
 
 def calculate_date_diff(start_date, end_date):
     """
