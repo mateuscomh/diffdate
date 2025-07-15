@@ -2,24 +2,32 @@
 # Programa para calcular a data futura após adicionar um número específico de dias
 #
 # Descrição: Este programa calcula a data que será após adicionar um número de dias
-# a partir de uma data inicial fornecida. 
+# a partir de uma data inicial fornecida.
 #
-# Versão: 1.2.2
+# Versão: 1.3.0
 # Data de criação: 11/03/2022
 # Autor: Matheus Martins - 3mhenrique@gmail.com
+# Modificado em: 15/07/2025
 # ----------------------------------------------------------------------------
 from datetime import datetime, timedelta
 import sys
+import locale
 
-from datetime import datetime
+# Configura o locale para Português do Brasil para nomes de dias da semana
+# Isso pode requerer que o locale 'pt_BR' esteja instalado no sistema operacional
+try:
+    locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+except locale.Error:
+    print("Locale 'pt_BR.UTF-8' não encontrado. Usando locale padrão.")
+
 
 def validate_user_input(user_input):
     """
     Valida a entrada do usuário.
     Retorna uma tupla (tipo, valor) onde:
     - tipo: "data" se for uma data no formato DD-MM-AAAA (também aceita DD/MM/AAAA)
-        "dias" se for um número inteiro 
-        "sair" se for 'q' ou 'Q', ou None se inválido.
+            "dias" se for um número inteiro
+            "sair" se for 'q' ou 'Q', ou None se inválido.
     - valor: a data (como string no formato padronizado), o número de dias, ou None.
     """
     if user_input.lower() == 'q':
@@ -53,15 +61,25 @@ def calculate_date_diff(start_date, end_date):
     if isinstance(end_date, str):
         end_date = datetime.strptime(end_date, "%d-%m-%Y")
 
-    diff_days = (end_date - start_date).days
+    # Guarda a diferença total original em dias
+    total_diff_days = (end_date - start_date).days
 
-    year_diff = end_date.year - start_date.year
-    month_diff = end_date.month - start_date.month
-    day_diff = end_date.day - start_date.day
+    # Garante que a data mais antiga seja a primeira para o cálculo
+    if start_date > end_date:
+        d1 = end_date
+        d2 = start_date
+    else:
+        d1 = start_date
+        d2 = end_date
+
+    year_diff = d2.year - d1.year
+    month_diff = d2.month - d1.month
+    day_diff = d2.day - d1.day
 
     if day_diff < 0:
         month_diff -= 1
-        prev_month_last_day = (end_date.replace(day=1) - timedelta(days=1)).day
+        # Pega o último dia do mês anterior para o empréstimo
+        prev_month_last_day = (d2.replace(day=1) - timedelta(days=1)).day
         day_diff += prev_month_last_day
 
     if month_diff < 0:
@@ -69,15 +87,26 @@ def calculate_date_diff(start_date, end_date):
         month_diff += 12
 
     result = []
-    if year_diff != 0:
-        result.append(f"{year_diff} ano(s)")
-    if month_diff != 0:
-        result.append(f"{month_diff} mês(es)")
-    if day_diff != 0:
-        result.append(f"{day_diff} dia(s)")
+    if year_diff > 0:
+        plural = "s" if year_diff > 1 else ""
+        result.append(f"{year_diff} ano{plural}")
+    if month_diff > 0:
+        plural = "es" if month_diff > 1 else ""
+        result.append(f"{month_diff} mês{plural}")
+    if day_diff > 0:
+        plural = "s" if day_diff > 1 else ""
+        result.append(f"{day_diff} dia{plural}")
 
-    result.append(f"\nTotal de {abs(diff_days)} dia(s)")
+    # Se a diferença for 0, informa isso.
+    if not result:
+        result.append("0 dia(s)")
+        
+    # Usa o valor absoluto para a frase final
+    plural_total = "s" if abs(total_diff_days) != 1 else ""
+    result.append(f"\nTotal de {abs(total_diff_days)} dia{plural_total}")
+    
     return ", ".join(result)
+
 
 def calculate_future_past_dates(days):
     """
@@ -88,10 +117,11 @@ def calculate_future_past_dates(days):
     future_date = today + timedelta(days=days)
     past_date = today - timedelta(days=days)
     return (
-        f"Hoje: {today.strftime('%d-%m-%Y (%A)')}\n"
-        f"{days} dias à frente será: {future_date.strftime('%d-%m-%Y (%A)')}\n"
-        f"{days} dias atrás foi: {past_date.strftime('%d-%m-%Y (%A)')}"
+        f"Hoje: {today.strftime('%d-%m-%Y (%A)').capitalize()}\n"
+        f"{days} dias à frente será: {future_date.strftime('%d-%m-%Y (%A)').capitalize()}\n"
+        f"{days} dias atrás foi: {past_date.strftime('%d-%m-%Y (%A)').capitalize()}"
     )
+
 
 def main():
     """
@@ -99,16 +129,16 @@ def main():
     """
     print(
         """
-    ,╔╦╗┬┌─┐┌─┐   ,╔╦╗┌─┐┌┬┐┌─┐   ,
-  ,'  ║║│├┤ ├┤  ,'  ║║├─┤ │ ├┤  ,' 
- '   ═╩╝┴└  └  '   ═╩╝┴ ┴ ┴ └─┘'   
+     ,╔╦╗┬┌─┐┌─┐   ,╔╦╗┌─┐┌┬┐┌─┐   ,
+   ,'  ║║│├┤ ├┤   ,'  ║║├─┤ │ ├┤   ,' 
+  '    ═╩╝┴└─┘└─┘'    ═╩╝┴ ┴ ┴ └─┘'   
         """
     )
 
     if len(sys.argv) > 1:
         user_input = sys.argv[1]
     else:
-        user_input = input("Insira uma data no formato (DD-MM-AAAA) ou um valor maior que 1 para calcular diferença de dias (ou 'q' para sair): ")
+        user_input = input("Insira uma data (DD-MM-AAAA) ou um número de dias (ou 'q' para sair): ")
 
     tipo, valor = validate_user_input(user_input)
 
@@ -116,8 +146,8 @@ def main():
         start_date = datetime.today()
         end_date = datetime.strptime(valor, "%d-%m-%Y")
         print(
-            f"Diferença entre hoje {start_date.strftime('%d-%m-%Y (%A)')} "
-            f"e {end_date.strftime('%d-%m-%Y (%A)')} é de:\n"
+            f"Diferença entre hoje {start_date.strftime('%d-%m-%Y (%A)').capitalize()} "
+            f"e {end_date.strftime('%d-%m-%Y (%A)').capitalize()} é de:\n"
             f"{calculate_date_diff(start_date, end_date)}"
         )
     elif tipo == "dias":
@@ -128,8 +158,9 @@ def main():
     else:
         print(
             "Entrada inválida. Insira uma data no formato DD-MM-AAAA ou\n"
-            "um número inteiro maior ou igual a 1 (ou 'q'/'Q' para sair)."
+            "um número inteiro maior que 0 (ou 'q'/'Q' para sair)."
         )
+
 
 if __name__ == "__main__":
     main()
