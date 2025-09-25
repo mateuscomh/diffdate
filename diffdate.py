@@ -143,7 +143,8 @@ def main():
     tipo, valor = validate_user_input(user_input)
 
     if tipo == "data":
-        start_date = datetime.today()
+#        start_date = datetime.today()
+        start_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
         end_date = datetime.strptime(valor, "%d-%m-%Y")
         print(
             f"Diferença entre hoje {start_date.strftime('%d-%m-%Y (%A)').capitalize()} "
